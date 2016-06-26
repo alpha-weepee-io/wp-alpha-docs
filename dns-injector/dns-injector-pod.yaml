@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  generateName: dns-injector-
+  labels:
+    app: dns-injector
+spec:
+  containers:
+    -
+      name: dns-injector
+      image: '172.30.203.239:5000/weepee-registry/dns-injector:latest'
+      ports:
+      env:
+        -
+          name: OPENSHIFT_MASTER_INTERNAL
+          value: 10.132.0.3
+        - name: OPENSHIFT_POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: OPENSHIFT_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+      resources:
+        limits:
+          cpu: 20m
+          memory: 256Mi
+        requests:
+          cpu: 10m
+          memory: 50Mi
+      terminationMessagePath: /dev/termination-log
+      imagePullPolicy: Always
+  restartPolicy: Never
+  terminationGracePeriodSeconds: 30
+  dnsPolicy: ClusterFirst
+  nodeSelector:
+    type: compute
